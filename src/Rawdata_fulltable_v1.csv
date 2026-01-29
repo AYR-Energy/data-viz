@@ -1,0 +1,74 @@
+index,Manufacturer,Location,Capability,OEM Class,Category,Region
+1,Hyosung HICO,"Memphis, TN [USA]",765 kV / 2250 MVA,International,Transformer,North America
+2,Hyundai Electric,"Montgomery, AL [USA]",800 kV / 21k MVA-yr,International,Transformer,North America
+3,Hitachi Energy,"Varennes, QC [CAN]",765 kV / EHV Power,Global,Transformer,North America
+4,Hitachi Energy,"South Boston, VA [USA]",765 kV / 800+ MVA,Global,Transformer,North America
+5,PTTI (PA Transformer),"Canonsburg, PA [USA]",765 kV / 750 MVA,Regional,Transformer,North America
+6,Prolec GE,"Waukesha, WI [USA]",345 kV / 1200 MVA,Global,Transformer,North America
+7,Virginia Transformer,"Roanoke, VA [USA]",525 kV / 1400 MVA-yr,Regional,Transformer,North America
+8,Virginia Transformer,"Rincon, GA [USA]",525 kV / 500 MVA,Regional,Transformer,North America
+9,Virginia Transformer,"Pocatello, ID [USA]",345 kV / 200 MVA,Regional,Transformer,North America
+10,Virginia Transformer,"Chihuahua [MEX]",230 kV / 200 MVA,Regional,Transformer,North America
+11,Ayr Partner (BHEL),"Prayagraj [IN]",1200 kV / Ultra HV,International,Transformer,International
+12,Ayr Partner (T&R),"Ahmedabad [IN]",765 kV / EHV Power,International,Transformer,International
+13,Ayr Partner (Voltamp),"Vadodara [IN]",500 kV / 500 MVA,International,Transformer,International
+14,PTI Transformers,"Winnipeg (Rockman), MB",525 kV / 600 MVA,Regional,Transformer,North America
+15,PTI Transformers,"Winnipeg (Service), MB",138 kV / Repair,Regional,Transformer,North America
+16,Mitsubishi (MEPPI),"Warrendale, PA [USA]",800 kV / GCB-GIS,International,Breaker,North America
+17,GE Vernova,"Charleroi, PA [USA]",550 kV / Dead Tank,Global,Breaker,North America
+18,Siemens Energy,"Richland, MS [USA]",550 kV / Blue GIS,Global,Breaker,North America
+19,Hitachi Energy,"Mt. Pleasant, PA [USA]",420 kV / EconiQ DTB,Global,Breaker,North America
+20,Howard Industries,"Laurel, MS [USA]",HV / 100+ MVA,Regional,Transformer,North America
+21,WEG (Voltran),"Huehuetoca [MEX]",500 kV / 300+ MVA,Regional,Transformer,North America
+22,WEG Transformers,"Washington, MO [USA]",161 kV / 100 MVA,Regional,Transformer,North America
+23,Delta Star,"Lynchburg, VA [USA]",230 kV / 150 MVA,Regional,Transformer,North America
+24,Delta Star,"San Carlos, CA [USA]",230 kV / 100 MVA,Regional,Transformer,North America
+25,Niagara Power,"Buffalo, NY [USA]",138 kV / 50 MVA,Regional,Transformer,North America
+26,Northern Transformer,"Vaughan, ON [CAN]",230 kV / 200 MVA,Regional,Transformer,North America
+27,PTI Transformers,"Regina, SK [CAN]",230 kV / 40 MVA,Regional,Transformer,North America
+28,Hitachi Energy,"Jefferson City, MO [USA]",161 kV / HV Substation,Global,Transformer,North Ameria\
+29,Hitachi Energy,"San Luis Potos\'ed [MEX]",500 kV / 300+ MVA,Global,Transformer,North America
+30,Prolec GE,"Goldsboro, NC [USA]",230 kV / 112 MVA,Global,Transformer,North America
+31,Prolec GE,"Monterrey, NL [MEX]",500 kV / 300+ MVA,Global,Transformer,North America
+32,Siemens Energy,"Guanajuato [MEX]",500 kV / 300+ MVA,Global,Transformer,North America
+33,Ayr Partner (CGL),"Mumbai [IN]",765 kV / Switchgear,International,Breaker,International
+34,Ayr Partner (Voltamp),"Savli [IN]",220 kV / 100 MVA,International,Transformer,International
+35,Zetwerk Mfg,"Multi-site [IN/NA]",1200 kV / EHV,International,Transformer,International
+36,Zetwerk Mfg,"Hosur [IN]",400 kV / 315 MVA,International,Transformer,International
+37,TBEA,"Shenyang [CHN]",1200 kV / Ultra HV,International,Transformer,International
+38,JSHP Transformer,"Changzhou [CHN]",500 kV / 500 MVA,International,Transformer,International
+39,Toshiba,"Hamakita [JPN]",800 kV / GIS,Global,Breaker,International
+40,Hitachi Energy,"Ludvika [SWE]",1100 kV / HVDC,Global,Transformer,International
+41,Siemens Energy,"Nuremberg [GER]",800 kV / EHV Power,Global,Transformer,International
+42,Schneider Electric,"Grenoble [FRA]",145 kV / GIS,Global,Breaker,International
+43,ABB,"Bad Honnef [GER]",400 kV / 500 MVA,Global,Transformer,International
+44,Iljin Electric,"Hwaseong [KOR]",550 kV / GIS,International,Breaker,International
+45,LS Electric,"Cheonan [KOR]",800 kV / GIS,International,Breaker,International
+46,Siemens Energy,"Jinan [CHN]",500 kV / 300 MVA,Global,Transformer,International
+47,Hitachi Energy,"Belo Horizonte [BRA]",500 kV / Power,Global,Transformer,International
+48,GE Vernova,"Sesto San Giovanni [ITA]",420 kV / GIS,Global,Breaker,International
+49,Mitsubishi Electric,"Ako [JPN]",500 kV / Power,Global,Transformer,International
+50,Siemens Energy,"Noreland [AUT]",400 kV / Transformer,Global,Transformer,International
+51,Ayr Partner,"Pune [IN]",220 kV / Distribution,International,Transformer,International
+52,Ayr Partner,"Kolkata [IN]",132 kV / Power,International,Transformer,International
+53,Ayr Partner,"Bangalore [IN]",400 kV / GIS,International,Breaker,International
+54,Hitachi Energy,"Hanoi [VNM]",220 kV / Power,Global,Transformer,International
+55,Siemens Energy,"Bogota [COL]",220 kV / Power,Global,Transformer,International
+56,ABB,"Cordoba [ARG]",132 kV / Power,Global,Transformer,International
+57,WEG,"Jaragu\'e1 do Sul [BRA]",500 kV / 500 MVA,Regional,Transformer,International
+58,Delta Star,"Auburn, IN [USA]",138 kV / Power,Regional,Transformer,North America
+59,Virginia Transformer,"Monterrey [MEX]",525 kV / 300 MVA,Regional,Transformer,North America
+60,Hitachi Energy,"Jefferson City, MO [USA]",MV / Distribution,Global,Transformer,North America
+61,Prolec GE,"Shreveport, LA [USA]",Network / 5 MVA,Global,Transformer,North America
+62,Eaton,"Greenwood, SC [USA]",38 kV / Switchgear,Global,Breaker,North America
+63,Eaton,"Waukesha, WI [USA]",35 kV / Distribution,Global,Transformer,North America
+64,Schneider Electric,"Hopkinsville, KY [USA]",MV / Switchgear,Global,Breaker,North America
+65,Powell Industries,"Houston, TX [USA]",38 kV / Switchgear,Regional,Breaker,North America
+66,Myers Power Products,"Ontario, CA [USA]",MV / Switchgear,Regional,Breaker,North America
+67,Tavrida Electric,"Tallinn [EST]",38 kV / Reclosers,International,Breaker,International
+68,Lucy Electric,"Thame [UK]",36 kV / Ring Main,International,Breaker,International
+69,Ormazabal,"Igurre [ESP]",36 kV / GIS,International,Breaker,International
+70,Wilson Transformer,"Wodonga [AUS]",220 kV / Power,International,Transformer,International
+71,Fortune Electric,"Chung-Li [TWN]",500 kV / Power,International,Transformer,International
+72,Crompton Greaves,"Bhopal [IN]",765 kV / EHV,International,Transformer,International
+73,Ayr Service Center,"Houston, TX [USA]",Field Service / Mobile,Regional,Transformer,North Americ
