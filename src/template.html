@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ayr Energy - Global HV Asset Landscape</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root { --ayr-blue: #003366; --accent: #2563eb; --dark: #0f172a; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #f8fafc; }
+        
+        header { 
+            background: var(--dark); color: white; padding: 0 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 4px solid var(--accent); height: 90px; box-sizing: border-box; 
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; }
+        
+        #wrapper { display: flex; flex-direction: column; height: calc(100vh - 90px); }
+        #map-area { height: 45%; min-height: 20%; width: 100%; position: relative; }
+        #map { height: 100%; width: 100%; }
+        
+        #resizer { 
+            height: 12px; background: #cbd5e1; cursor: ns-resize; width: 100%; 
+            display: flex; justify-content: center; align-items: center; 
+            color: #475569; font-size: 14px; font-weight: bold; user-select: none;
+        }
+        #resizer:hover { background: #94a3b8; color: white; }
+
+        #table-area { flex: 1; overflow-y: auto; background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1100px; }
+        thead th { position: sticky; top: 0; background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid #cbd5e1; z-index: 10; color: #475569; }
+        tbody td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        .pill { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 9px; color: white; text-transform: uppercase; }
+        .site-label { background: rgba(255,255,255,0.9); border: 1.2px solid var(--dark); padding: 1px 4px; font-size: 9px; font-weight: 800; white-space: nowrap; }
+        
+        .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .control-group { display: flex; align-items: center; gap: 8px; background: #334155; padding: 4px 10px; border-radius: 4px; border: 1px solid #475569; color: white; font-size: 11px; }
+        input[type="text"], select { padding: 4px; border-radius: 3px; background: #1e293b; color: white; border: 1px solid #475569; font-size: 11px; }
+        
+        .legend { background: white; padding: 8px; border-radius: 5px; line-height: 16px; color: #333; box-shadow: 0 0 15px rgba(0,0,0,0.2); font-size: 10px; }
+        .legend i { width: 10px; height: 10px; float: left; margin-right: 6px; border-radius: 50%; border: 1px solid #fff; margin-top: 3px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-box">
+        <h2 style="margin:0; font-size: 16px;">AYR ENERGY - HV LANDSCAPE</h2>
+    </div>
+    <div class="controls">
+        <input type="text" id="searchTerm" placeholder="Search mfg, city..." onkeyup="renderUI()">
+        
+        <div class="control-group">
+            <label>Min Voltage:</label>
+            <input type="range" id="voltSlider" min="0" max="1200" step="50" value="0" oninput="updateSlider(this.value)">
+            <span id="voltVal">0 kV</span>
+        </div>
+
+        <div class="control-group">
+            <input type="checkbox" id="labelToggle" checked onchange="renderUI()"> Labels
+        </div>
+
+        <select id="regFilter" onchange="renderUI()">
+            <option value="All">All Regions</option>
+            <option value="North America">North America</option>
+            <option value="International">International</option>
+        </select>
+        
+        <select id="typeFilter" onchange="renderUI()">
+            <option value="All">All Categories</option>
+            <option value="Transformer">Transformers</option>
+            <option value="Breaker">Breakers</option>
+        </select>
+    </div>
+</header>
+
+<div id="wrapper">
+    <div id="map-area"><div id="map"></div></div>
+    <div id="resizer">⬟</div>
+    <div id="table-area">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30px;">#</th>
+                    <th>Manufacturer</th>
+                    <th>Facility Location</th>
+                    <th>Capability (Voltage / Capacity)</th>
+                    <th>OEM Class</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const COLORS = { "Global": "#ef4444", "Regional": "#16a34a", "International": "#d97706" };
+    
+    const DATA = __DATA__;
+
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+    const mGroup = L.layerGroup().addTo(map);
+
+    function updateSlider(val) {
+        document.getElementById('voltVal').innerText = val + " kV";
+        renderUI();
+    }
+
+    function extractVoltage(str) {
+        const match = str.match(/(\d+)\s*kV/i);
+        return match ? parseInt(match[1]) : 0;
+    }
+
+    function renderUI() {
+        const type = document.getElementById('typeFilter').value;
+        const reg = document.getElementById('regFilter').value;
+        const search = document.getElementById('searchTerm').value.toLowerCase();
+        const minVolt = parseInt(document.getElementById('voltSlider').value);
+        const labelsOn = document.getElementById('labelToggle').checked;
+        const tbody = document.getElementById('tbody');
+        tbody.innerHTML = "";
+        mGroup.clearLayers();
+
+        let count = 1;
+        DATA.forEach(s => {
+            const v = extractVoltage(s.cap);
+            const matchesSearch = s.mfg.toLowerCase().includes(search) || s.loc.toLowerCase().includes(search) || s.cap.toLowerCase().includes(search);
+            const matchesVolt = (minVolt === 0 || v >= minVolt);
+
+            if (matchesSearch && matchesVolt && (type === "All" || s.cat === type) && (reg === "All" || s.reg === reg)) {
+                const row = tbody.insertRow();
+                row.innerHTML = `<td>${count}</td><td><b>${s.mfg}</b></td><td>${s.loc}</td><td>${s.cap}</td><td><span class="pill" style="background:${COLORS[s.oem]}">${s.oem}</span></td><td><span class="pill" style="background:#64748b">${s.cat}</span></td>`;
+                
+                const marker = L.circleMarker([s.lat, s.lon], { radius: 6, fillColor: COLORS[s.oem], color: "#fff", weight: 1.5, fillOpacity: 0.9 }).addTo(mGroup);
+                
+                if (labelsOn) {
+                    const labelTxt = s.cap.length > 5 ? `${s.mfg} - ${s.cap}` : s.mfg;
+                    marker.bindTooltip(labelTxt, { permanent: true, className: 'site-label', direction: 'right', offset: [8, 0] });
+                }
+                marker.bindPopup(`<strong>${s.mfg}</strong><br>${s.loc}<br>${s.cap}`);
+                count++;
+            }
+        });
+    }
+
+    const legend = L.control({position: 'bottomright'});
+    legend.onAdd = function () {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += '<b>OEM Class</b><br>';
+        for (let label in COLORS) { div.innerHTML += `<i style="background:${COLORS[label]}"></i> ${label}<br>`; }
+        return div;
+    };
+    legend.addTo(map);
+
+    const resizer = document.getElementById('resizer'), area = document.getElementById('map-area');
+    let isResizing = false;
+    resizer.addEventListener('mousedown', () => isResizing = true);
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        let offset = e.clientY - 90;
+        let percentage = (offset / (window.innerHeight - 90)) * 100;
+        if (percentage > 20 && percentage < 80) {
+            area.style.height = percentage + "%";
+            map.invalidateSize();
+        }
+    });
+    document.addEventListener('mouseup', () => isResizing = false);
+
+    renderUI();
+</script>
+</body>
+</html>

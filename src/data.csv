@@ -1,0 +1,74 @@
+mfg,loc,cap,oem,cat,reg,lat,lon
+Hyosung HICO,"Memphis, TN [USA]","765 kV / 2250 MVA",International,Transformer,North America,35.07,-90.10
+Hyundai Electric,"Montgomery, AL [USA]","800 kV / 21k MVA-yr",International,Transformer,North America,32.26,-86.37
+Hitachi Energy,"Varennes, QC [CAN]","765 kV / EHV Power",Global,Transformer,North America,45.68,-73.43
+Hitachi Energy,"South Boston, VA [USA]","765 kV / 800+ MVA",Global,Transformer,North America,36.67,-78.92
+PTTI (PA Transformer),"Canonsburg, PA [USA]","765 kV / 750 MVA",Regional,Transformer,North America,40.26,-80.19
+Prolec GE,"Waukesha, WI [USA]","345 kV / 1200 MVA",Global,Transformer,North America,43.00,-88.24
+Virginia Transformer,"Roanoke, VA [USA]","525 kV / 1400 MVA-yr",Regional,Transformer,North America,37.27,-79.94
+Virginia Transformer,"Rincon, GA [USA]","525 kV / 500 MVA",Regional,Transformer,North America,32.29,-81.23
+Virginia Transformer,"Pocatello, ID [USA]","345 kV / 200 MVA",Regional,Transformer,North America,42.87,-112.44
+Virginia Transformer,"Chihuahua [MEX]","230 kV / 200 MVA",Regional,Transformer,North America,28.63,-106.06
+PTI Transformers,"Winnipeg (Rockman), MB","525 kV / 600 MVA",Regional,Transformer,North America,49.85,-97.14
+PTI Transformers,"Winnipeg (Service), MB","138 kV / Repair",Regional,Transformer,North America,49.92,-97.10
+Mitsubishi (MEPPI),"Warrendale, PA [USA]","800 kV / GCB-GIS",International,Breaker,North America,40.67,-80.11
+GE Vernova,"Charleroi, PA [USA]","550 kV / Dead Tank",Global,Breaker,North America,40.13,-79.90
+Siemens Energy,"Richland, MS [USA]","550 kV / Blue GIS",Global,Breaker,North America,32.22,-90.17
+Hitachi Energy,"Mt. Pleasant, PA [USA]","420 kV / EconiQ DTB",Global,Breaker,North America,40.15,-79.54
+Howard Industries,"Laurel, MS [USA]","HV / 100+ MVA",Regional,Transformer,North America,31.69,-89.13
+WEG (Voltran),"Huehuetoca [MEX]","500 kV / 300+ MVA",Regional,Transformer,North America,19.83,-99.20
+Delta Star,"Lynchburg, VA [USA]","230 kV / 150 MVA",Regional,Transformer,North America,37.41,-79.14
+Delta Star,"San Carlos, CA [USA]","230 kV / 100 MVA",Regional,Transformer,North America,37.50,-122.25
+Niagara Power,"Buffalo, NY [USA]","138 kV / 50 MVA",Regional,Transformer,North America,42.88,-78.87
+Northern Transformer,"Vaughan, ON [CAN]","230 kV / 200 MVA",Regional,Transformer,North America,43.83,-79.50
+PTI Transformers,"Regina, SK [CAN]","230 kV / 40 MVA",Regional,Transformer,North America,50.44,-104.61
+Hitachi Energy,"Jefferson City, MO [USA]","161 kV / HV Sub",Global,Transformer,North America,38.57,-92.17
+Hitachi Energy,"San Luis Potosí [MEX]","500 kV / 300+ MVA",Global,Transformer,North America,22.15,-100.98
+Prolec GE,"Goldsboro, NC [USA]","230 kV / 112 MVA",Global,Transformer,North America,35.38,-77.99
+Prolec GE,"Monterrey, NL [MEX]","500 kV / 300+ MVA",Global,Transformer,North America,25.68,-100.31
+Ayr Partner (BHEL),"Prayagraj [IN]","1200 kV / Ultra HV",International,Transformer,International,25.43,81.84
+Ayr Partner (T&R),"Ahmedabad [IN]","765 kV / EHV Power",International,Transformer,International,23.02,72.57
+Ayr Partner (Voltamp),"Vadodara [IN]","500 kV / 500 MVA",International,Transformer,International,22.30,73.18
+Ayr Partner (CGL),"Mumbai [IN]","765 kV / Switchgear",International,Breaker,International,19.07,72.87
+Zetwerk Mfg,"Hosur [IN]","400 kV / 315 MVA",International,Transformer,International,12.74,77.82
+Zetwerk Mfg,"Chennai [IN]","220 kV / 100 MVA",International,Transformer,International,13.08,80.27
+Ayr Partner (Voltamp),"Savli [IN]","220 kV / 100 MVA",International,Transformer,International,22.54,73.23
+TBEA,"Shenyang [CHN]","1200 kV / Ultra HV",International,Transformer,International,41.80,123.43
+JSHP Transformer,"Changzhou [CHN]","500 kV / 500 MVA",International,Transformer,International,31.78,119.96
+Toshiba,"Hamakita [JPN]","800 kV / GIS",Global,Breaker,International,34.71,137.73
+Hitachi Energy,"Ludvika [SWE]","1100 kV / HVDC",Global,Transformer,International,60.14,15.18
+Siemens Energy,"Nuremberg [GER]","800 kV / EHV Power",Global,Transformer,International,49.45,11.07
+Schneider Electric,"Grenoble [FRA]","145 kV / GIS",Global,Breaker,International,45.18,5.72
+ABB,"Bad Honnef [GER]","400 kV / 500 MVA",Global,Transformer,International,50.64,7.22
+Iljin Electric,"Hwaseong [KOR]","550 kV / GIS",International,Breaker,International,37.19,126.83
+LS Electric,"Cheonan [KOR]","800 kV / GIS",International,Breaker,International,36.81,127.11
+Siemens Energy,"Jinan [CHN]","500 kV / 300 MVA",Global,Transformer,International,36.65,117.00
+Hitachi Energy,"Belo Horizonte [BRA]","500 kV / Power",Global,Transformer,International,-19.91,-43.93
+GE Vernova,"Sesto S. G. [ITA]","420 kV / GIS",Global,Breaker,International,45.53,9.22
+Mitsubishi Electric,"Ako [JPN]","500 kV / Power",Global,Transformer,International,34.75,134.39
+Siemens Energy,"Weiz [AUT]","400 kV / Power",Global,Transformer,International,47.21,15.62
+Ayr Partner,"Pune [IN]","220 kV / Dist.",International,Transformer,International,18.52,73.85
+Ayr Partner,"Kolkata [IN]","132 kV / Power",International,Transformer,International,22.57,88.36
+Ayr Partner,"Bangalore [IN]","400 kV / GIS",International,Breaker,International,12.97,77.59
+Hitachi Energy,"Hanoi [VNM]","220 kV / Power",Global,Transformer,International,21.02,105.83
+Siemens Energy,"Bogota [COL]","220 kV / Power",Global,Transformer,International,4.71,-74.07
+ABB,"Cordoba [ARG]","132 kV / Power",Global,Transformer,International,-31.42,-64.18
+WEG,"Jaraguá [BRA]","500 kV / 500 MVA",Regional,Transformer,International,-26.48,-49.07
+Delta Star,"Auburn, IN [USA]","138 kV / Power",Regional,Transformer,North America,41.36,-85.05
+Virginia Transformer,"Monterrey [MEX]","525 kV / 300 MVA",Regional,Transformer,North America,25.72,-100.32
+Eaton,"Greenwood, SC [USA]","38 kV / Switchgear",Global,Breaker,North America,34.19,-82.16
+Eaton,"Waukesha, WI [USA]","35 kV / Dist.",Global,Transformer,North America,43.01,-88.23
+Schneider Electric,"Hopkinsville, KY","MV / Switchgear",Global,Breaker,North America,36.86,-87.48
+Powell Industries,"Houston, TX [USA]","38 kV / Switchgear",Regional,Breaker,North America,29.76,-95.36
+Myers Power,"Ontario, CA [USA]","MV / Switchgear",Regional,Breaker,North America,34.06,-117.65
+Tavrida Electric,"Tallinn [EST]","38 kV / Recloser",International,Breaker,International,59.43,24.75
+Lucy Electric,"Thame [UK]","36 kV / RMU",International,Breaker,International,51.74,-0.97
+Ormazabal,"Igorre [ESP]","36 kV / GIS",International,Breaker,International,43.13,-2.77
+Wilson Transformer,"Wodonga [AUS]","220 kV / Power",International,Transformer,International,-36.12,146.88
+Fortune Electric,"Chung-Li [TWN]","500 kV / Power",International,Transformer,International,24.96,121.22
+Crompton Greaves,"Bhopal [IN]","765 kV / EHV",International,Transformer,International,23.25,77.41
+Ayr Service,"Houston, TX [USA]","Field / Mobile",Regional,Transformer,North America,29.80,-95.40
+Prolec GE,"Shreveport, LA","Network / 5 MVA",Global,Transformer,North America,32.51,-93.75
+Siemens Energy,"Guanajuato [MEX]","500 kV / 300+ MVA",Global,Transformer,North America,21.01,-101.25
+Hitachi Energy,"Jefferson City, MO","Dist / Padmount",Global,Transformer,North America,38.58,-92.18
+Virginia Transformer,"Pocatello (Dry)","7 MVA / 35 kV",Regional,Transformer,North America,42.88,-112.45
