@@ -189,7 +189,7 @@
       accent-color: var(--accent);
     }
 
-    /* Make selects look nicer on dark header (remove weird focus outline in some browsers) */
+    /* Make selects look nicer on dark header */
     select{
       appearance: none;
       background-image:
@@ -270,8 +270,13 @@
       vertical-align: middle;
     }
 
+    /* Hover + selected row styling */
     tbody tr:hover td{
-      background: rgba(47,108,255,0.04);
+      background: rgba(32, 0, 211, 0.06);
+      cursor: pointer;
+    }
+    tbody tr.is-selected td{
+      background: rgba(32, 0, 211, 0.12);
     }
 
     .pill {
@@ -332,12 +337,33 @@
       color: rgba(255,255,255,0.78);
     }
 
-    /* Responsive: on narrow screens, let controls panel wrap nicely */
+    /* Responsive */
     @media (max-width: 980px){
       .topbar{ height: auto; padding: 14px 16px; align-items:flex-start; }
       #wrapper{ height: calc(100vh - 140px); }
       .controls-panel{ max-width: 100%; width: 100%; }
       .brand{ min-width: unset; }
+    }
+
+    /* ===== GPL 3.0 Notice (small) ===== */
+    .license-note{
+      position: fixed;
+      right: 10px;
+      bottom: 8px;
+      font-size: 10px;
+      line-height: 1.2;
+      color: rgba(255,255,255,0.80);
+      background: rgba(0,0,0,0.22);
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      z-index: 9999;
+      user-select: none;
+    }
+    .license-note a{
+      color: rgba(255,255,255,0.92);
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
   </style>
 </head>
@@ -409,7 +435,16 @@
     </div>
   </div>
 
+  <!-- GNU GPL 3.0 notice -->
+  <div class="license-note">
+    © <span id="yr"></span> Ayr Energy · Licensed under
+    <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU GPL 3.0</a>
+  </div>
+
   <script>
+    // year for license footer
+    document.getElementById("yr").textContent = '2025';
+
     const COLORS = { "Global": "#ef4444", "Regional": "#16a34a", "International": "#d97706" };
 
     // Python injects JSON array here
@@ -429,6 +464,23 @@
       return match ? parseInt(match[1]) : 0;
     }
 
+    // ===== Marker <-> row interactions =====
+    let hoveredMarker = null;
+    let selectedMarker = null;
+
+    function setMarkerHighlight(marker, on) {
+      if (!marker) return;
+      marker.setStyle({
+        radius: on ? 9 : 6,
+        weight: on ? 3 : 1.5,
+        fillOpacity: on ? 1.0 : 0.92
+      });
+    }
+
+    function clearSelectedRow() {
+      document.querySelectorAll("#tbody tr.is-selected").forEach(tr => tr.classList.remove("is-selected"));
+    }
+
     function renderUI() {
       const type = document.getElementById('typeFilter').value;
       const reg = document.getElementById('regFilter').value;
@@ -436,12 +488,18 @@
       const minVolt = parseInt(document.getElementById('voltSlider').value);
       const labelsOn = document.getElementById('labelToggle').checked;
       const tbody = document.getElementById('tbody');
+
       tbody.innerHTML = "";
       mGroup.clearLayers();
 
+      hoveredMarker = null;
+      selectedMarker = null;
+
       let count = 1;
+
       DATA.forEach(s => {
         const v = extractVoltage(s.cap);
+
         const matchesSearch =
           String(s.mfg).toLowerCase().includes(search) ||
           String(s.loc).toLowerCase().includes(search) ||
@@ -454,15 +512,7 @@
           (type === "All" || s.cat === type) &&
           (reg === "All" || s.reg === reg)
         ) {
-          const row = tbody.insertRow();
-          row.innerHTML =
-            `<td>${count}</td>
-             <td><b>${s.mfg}</b></td>
-             <td>${s.loc}</td>
-             <td>${s.cap}</td>
-             <td><span class="pill" style="background:${COLORS[s.oem] || "#64748b"}">${s.oem}</span></td>
-             <td><span class="pill" style="background:#64748b">${s.cat}</span></td>`;
-
+          // Create marker
           const marker = L.circleMarker([s.lat, s.lon], {
             radius: 6,
             fillColor: COLORS[s.oem] || "#64748b",
@@ -480,8 +530,45 @@
               offset: [8, 0]
             });
           }
-
           marker.bindPopup(`<strong>${s.mfg}</strong><br>${s.loc}<br>${s.cap}`);
+
+          // Create row (for event hooks)
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            `<td>${count}</td>
+             <td><b>${s.mfg}</b></td>
+             <td>${s.loc}</td>
+             <td>${s.cap}</td>
+             <td><span class="pill" style="background:${COLORS[s.oem] || "#64748b"}">${s.oem}</span></td>
+             <td><span class="pill" style="background:#64748b">${s.cat}</span></td>`;
+
+          // Hover => highlight marker
+          tr.addEventListener("mouseenter", () => {
+            if (hoveredMarker && hoveredMarker !== selectedMarker) setMarkerHighlight(hoveredMarker, false);
+            hoveredMarker = marker;
+            if (marker !== selectedMarker) setMarkerHighlight(marker, true);
+          });
+
+          tr.addEventListener("mouseleave", () => {
+            if (marker !== selectedMarker) setMarkerHighlight(marker, false);
+            hoveredMarker = null;
+          });
+
+          // Click => pan/zoom + popup + keep highlighted + select row
+          tr.addEventListener("click", () => {
+            if (selectedMarker && selectedMarker !== marker) setMarkerHighlight(selectedMarker, false);
+
+            clearSelectedRow();
+            tr.classList.add("is-selected");
+
+            selectedMarker = marker;
+            setMarkerHighlight(marker, true);
+
+            map.setView([s.lat, s.lon], Math.max(map.getZoom(), 5), { animate: true });
+            marker.openPopup();
+          });
+
+          tbody.appendChild(tr);
           count++;
         }
       });
