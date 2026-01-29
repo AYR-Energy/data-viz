@@ -1,232 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Ayr Energy - Global HV Asset Landscape</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        :root { --ayr-blue: #003366; --accent: #2563eb; --dark: #0f172a; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #f8fafc; }
-        
-        header { 
-            background: var(--dark); color: white; padding: 0 20px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 4px solid var(--accent); height: 90px; box-sizing: border-box; 
-        }
-        .logo-box { display: flex; align-items: center; gap: 15px; }
-        
-        #wrapper { display: flex; flex-direction: column; height: calc(100vh - 90px); }
-        #map-area { height: 45%; min-height: 20%; width: 100%; position: relative; }
-        #map { height: 100%; width: 100%; }
-        
-        #resizer { 
-            height: 12px; background: #cbd5e1; cursor: ns-resize; width: 100%; 
-            display: flex; justify-content: center; align-items: center; 
-            color: #475569; font-size: 14px; font-weight: bold; user-select: none;
-        }
-        #resizer:hover { background: #94a3b8; color: white; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ayr Energy - Global HV Asset Landscape</title>
 
-        #table-area { flex: 1; overflow-y: auto; background: white; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1100px; }
-        thead th { position: sticky; top: 0; background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid #cbd5e1; z-index: 10; color: #475569; }
-        tbody td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        
-        .pill { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 9px; color: white; text-transform: uppercase; }
-        .site-label { background: rgba(255,255,255,0.9); border: 1.2px solid var(--dark); padding: 1px 4px; font-size: 9px; font-weight: 800; white-space: nowrap; }
-        
-        .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .control-group { display: flex; align-items: center; gap: 8px; background: #334155; padding: 4px 10px; border-radius: 4px; border: 1px solid #475569; color: white; font-size: 11px; }
-        input[type="text"], select { padding: 4px; border-radius: 3px; background: #1e293b; color: white; border: 1px solid #475569; font-size: 11px; }
-        
-        .legend { background: white; padding: 8px; border-radius: 5px; line-height: 16px; color: #333; box-shadow: 0 0 15px rgba(0,0,0,0.2); font-size: 10px; }
-        .legend i { width: 10px; height: 10px; float: left; margin-right: 6px; border-radius: 50%; border: 1px solid #fff; margin-top: 3px; }
-    </style>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* Ayr-ish look: deep blacks, crisp type, blue accent, subtle glow/gradients */
+    :root{
+      --bg0: #2000D3;
+      --bg1: #2000D3;
+      --bg2: #2000D3;
+
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.68);
+
+      --stroke: rgba(255,255,255,0.10);
+
+      --accent: #2f6cff;   /* bold Ayr-ish blue */
+      --accent2:#5aa2ff;   /* highlight */
+
+      /* Light area */
+      --tableBg: rgba(255,255,255,0.97);
+      --tableHead: #f3f6fb;
+      --tableText: #0b1220;
+      --tableMuted: #475569;
+
+      --radius: 14px;
+      --shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow: hidden;
+      background:
+        radial-gradient(900px 450px at 14% 0%, rgba(47,108,255,0.22), transparent 60%),
+        radial-gradient(700px 380px at 80% 10%, rgba(90,162,255,0.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg2));
+      color: var(--text);
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar{
+      height: 96px;
+      padding: 0 22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-sizing: border-box;
+      position: relative;
+
+      background:
+        radial-gradient(1200px 420px at 20% 0%, rgba(47,108,255,0.22), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 70%, rgba(10,16,32,0.6) 100%);
+      border-bottom: 1px solid var(--stroke);
+      gap: 16px;
+    }
+
+    /* Accent hairline */
+    .topbar::after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:-1px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(47,108,255,0.75), transparent);
+      pointer-events:none;
+    }
+
+    /* Subtle wave motif */
+    .topbar::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 44px;
+      background:
+        radial-gradient(120px 44px at 10% 100%, rgba(255,255,255,0.06), transparent 70%),
+        radial-gradient(160px 52px at 30% 100%, rgba(255,255,255,0.04), transparent 70%),
+        radial-gradient(200px 58px at 55% 100%, rgba(255,255,255,0.035), transparent 70%),
+        radial-gradient(160px 52px at 78% 100%, rgba(255,255,255,0.04), transparent 70%);
+      opacity: 0.85;
+      pointer-events:none;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width: 260px;
+      z-index: 1; /* above header ornaments */
+    }
+
+    .logo{
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      /* filter: drop-shadow(0 10px 26px rgba(0,0,0,0.45)); */
+    }
+
+    .brand-text{
+      display:none;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+    }
+    .title-kicker{
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .title-main{
+      margin-top: 3px;
+      font-size: 16px;
+      font-weight: 650;
+      color: var(--text);
+    }
+
+    /* ---------- White controls panel ---------- */
+    .controls-panel{
+      background: rgba(170,197,255,0.96);
+      border-radius: 16px;
+      padding: 10px 12px;
+      /* box-shadow:
+        0 20px 50px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.8); */
+      z-index: 1; /* above header ornaments */
+      max-width: 68vw;
+    }
+
+    .controls{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .control-group{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #dbe4f0;
+      color: #334155;
+      font-size: 11px;
+      user-select:none;
+    }
+
+    input[type="text"], select{
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #0b1220;
+      border: 1px solid #dbe4f0;
+      font-size: 12px;
+      outline: none;
+      box-shadow: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    input[type="text"]::placeholder{
+      color: #64748b;
+    }
+
+    input[type="text"]:focus, select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(47,108,255,0.15);
+    }
+
+    input[type="range"]{
+      accent-color: var(--accent);
+    }
+
+    /* Make selects look nicer on dark header (remove weird focus outline in some browsers) */
+    select{
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #64748b 50%),
+        linear-gradient(135deg, #64748b 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 12px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 28px;
+    }
+
+    /* ---------- Layout ---------- */
+    #wrapper {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 96px);
+    }
+
+    #map-area {
+      height: 46%;
+      min-height: 20%;
+      width: 100%;
+      position: relative;
+    }
+    #map { height: 100%; width: 100%; }
+
+    #resizer{
+      height: 12px;
+      width: 100%;
+      cursor: ns-resize;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      user-select:none;
+      color: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.08);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    #resizer:hover{
+      background: rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.88);
+    }
+
+    #table-area {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--tableBg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      min-width: 1100px;
+      color: var(--tableText);
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--tableHead);
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid #dbe4f0;
+      z-index: 10;
+      color: var(--tableMuted);
+    }
+
+    tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eef2f7;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover td{
+      background: rgba(47,108,255,0.04);
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 750;
+      font-size: 9px;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+
+    .site-label {
+      background: rgba(255,255,255,0.93);
+      border: 1.2px solid #0b1220;
+      padding: 1px 6px;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+    }
+
+    .legend {
+      background: rgba(11, 18, 32, 0.92);
+      color: rgba(255,255,255,0.92);
+      padding: 12px 12px;
+      border-radius: 14px;
+      line-height: 16px;
+      box-shadow: var(--shadow);
+      font-size: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .legend i {
+      width: 10px;
+      height: 10px;
+      float: left;
+      margin-right: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.35);
+      margin-top: 3px;
+    }
+
+    /* Leaflet popup styling */
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip{
+      background: rgba(11, 18, 32, 0.94);
+      color: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+    }
+    .leaflet-popup-content{
+      margin: 10px 12px;
+      font-size: 12px;
+    }
+    .leaflet-container a.leaflet-popup-close-button{
+      color: rgba(255,255,255,0.78);
+    }
+
+    /* Responsive: on narrow screens, let controls panel wrap nicely */
+    @media (max-width: 980px){
+      .topbar{ height: auto; padding: 14px 16px; align-items:flex-start; }
+      #wrapper{ height: calc(100vh - 140px); }
+      .controls-panel{ max-width: 100%; width: 100%; }
+      .brand{ min-width: unset; }
+    }
+  </style>
 </head>
-<body>
 
-<header>
-    <div class="logo-box">
-        <h2 style="margin:0; font-size: 16px;">AYR ENERGY - HV LANDSCAPE</h2>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img
+        src="./logo.png"
+        alt="Ayr Energy"
+        class="logo"
+        onerror="this.style.display='none'; document.querySelector('.brand-text').style.display='block';"
+      />
+      <div class="brand-text">AYR ENERGY</div>
+
+      <div class="title">
+        <div class="title-kicker">HV Assets</div>
+        <div class="title-main">Global Landscape</div>
+      </div>
     </div>
-    <div class="controls">
+
+    <div class="controls-panel">
+      <div class="controls">
         <input type="text" id="searchTerm" placeholder="Search mfg, city..." onkeyup="renderUI()">
-        
+
         <div class="control-group">
-            <label>Min Voltage:</label>
-            <input type="range" id="voltSlider" min="0" max="1200" step="50" value="0" oninput="updateSlider(this.value)">
-            <span id="voltVal">0 kV</span>
+          <label>Min Voltage</label>
+          <input type="range" id="voltSlider" min="0" max="1200" step="50" value="0" oninput="updateSlider(this.value)">
+          <span id="voltVal">0 kV</span>
         </div>
 
         <div class="control-group">
-            <input type="checkbox" id="labelToggle" checked onchange="renderUI()"> Labels
+          <input type="checkbox" id="labelToggle" checked onchange="renderUI()"> Labels
         </div>
 
         <select id="regFilter" onchange="renderUI()">
-            <option value="All">All Regions</option>
-            <option value="North America">North America</option>
-            <option value="International">International</option>
+          <option value="All">All Regions</option>
+          <option value="North America">North America</option>
+          <option value="International">International</option>
         </select>
-        
-        <select id="typeFilter" onchange="renderUI()">
-            <option value="All">All Categories</option>
-            <option value="Transformer">Transformers</option>
-            <option value="Breaker">Breakers</option>
-        </select>
-    </div>
-</header>
 
-<div id="wrapper">
+        <select id="typeFilter" onchange="renderUI()">
+          <option value="All">All Categories</option>
+          <option value="Transformer">Transformers</option>
+          <option value="Breaker">Breakers</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div id="wrapper">
     <div id="map-area"><div id="map"></div></div>
     <div id="resizer">⬟</div>
-    <div id="table-area">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 30px;">#</th>
-                    <th>Manufacturer</th>
-                    <th>Facility Location</th>
-                    <th>Capability (Voltage / Capacity)</th>
-                    <th>OEM Class</th>
-                    <th>Category</th>
-                </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-        </table>
-    </div>
-</div>
 
-<script>
+    <div id="table-area">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30px;">#</th>
+            <th>Manufacturer</th>
+            <th>Facility Location</th>
+            <th>Capability (Voltage / Capacity)</th>
+            <th>OEM Class</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
     const COLORS = { "Global": "#ef4444", "Regional": "#16a34a", "International": "#d97706" };
-    
-    const DATA = [
-        { mfg: "Hyosung HICO", loc: "Memphis, TN [USA]", cap: "765 kV / 2250 MVA", oem: "International", cat: "Transformer", reg: "North America", lat: 35.07, lon: -90.10 },
-        { mfg: "Hyundai Electric", loc: "Montgomery, AL [USA]", cap: "800 kV / 21k MVA-yr", oem: "International", cat: "Transformer", reg: "North America", lat: 32.26, lon: -86.37 },
-        { mfg: "Hitachi Energy", loc: "Varennes, QC [CAN]", cap: "765 kV / EHV Power", oem: "Global", cat: "Transformer", reg: "North America", lat: 45.68, lon: -73.43 },
-        { mfg: "Hitachi Energy", loc: "South Boston, VA [USA]", cap: "765 kV / 800+ MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 36.67, lon: -78.92 },
-        { mfg: "PTTI (PA Transformer)", loc: "Canonsburg, PA [USA]", cap: "765 kV / 750 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 40.26, lon: -80.19 },
-        { mfg: "Prolec GE", loc: "Waukesha, WI [USA]", cap: "345 kV / 1200 MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 43.00, lon: -88.24 },
-        { mfg: "Virginia Transformer", loc: "Roanoke, VA [USA]", cap: "525 kV / 1400 MVA-yr", oem: "Regional", cat: "Transformer", reg: "North America", lat: 37.27, lon: -79.94 },
-        { mfg: "Virginia Transformer", loc: "Rincon, GA [USA]", cap: "525 kV / 500 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 32.29, lon: -81.23 },
-        { mfg: "Virginia Transformer", loc: "Pocatello, ID [USA]", cap: "345 kV / 200 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 42.87, lon: -112.44 },
-        { mfg: "Virginia Transformer", loc: "Chihuahua [MEX]", cap: "230 kV / 200 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 28.63, lon: -106.06 },
-        { mfg: "PTI Transformers", loc: "Winnipeg (Rockman), MB", cap: "525 kV / 600 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 49.85, lon: -97.14 },
-        { mfg: "PTI Transformers", loc: "Winnipeg (Service), MB", cap: "138 kV / Repair", oem: "Regional", cat: "Transformer", reg: "North America", lat: 49.92, lon: -97.10 },
-        { mfg: "Mitsubishi (MEPPI)", loc: "Warrendale, PA [USA]", cap: "800 kV / GCB-GIS", oem: "International", cat: "Breaker", reg: "North America", lat: 40.67, lon: -80.11 },
-        { mfg: "GE Vernova", loc: "Charleroi, PA [USA]", cap: "550 kV / Dead Tank", oem: "Global", cat: "Breaker", reg: "North America", lat: 40.13, lon: -79.90 },
-        { mfg: "Siemens Energy", loc: "Richland, MS [USA]", cap: "550 kV / Blue GIS", oem: "Global", cat: "Breaker", reg: "North America", lat: 32.22, lon: -90.17 },
-        { mfg: "Hitachi Energy", loc: "Mt. Pleasant, PA [USA]", cap: "420 kV / EconiQ DTB", oem: "Global", cat: "Breaker", reg: "North America", lat: 40.15, lon: -79.54 },
-        { mfg: "Howard Industries", loc: "Laurel, MS [USA]", cap: "HV / 100+ MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 31.69, lon: -89.13 },
-        { mfg: "WEG (Voltran)", loc: "Huehuetoca [MEX]", cap: "500 kV / 300+ MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 19.83, lon: -99.20 },
-        { mfg: "Delta Star", loc: "Lynchburg, VA [USA]", cap: "230 kV / 150 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 37.41, lon: -79.14 },
-        { mfg: "Delta Star", loc: "San Carlos, CA [USA]", cap: "230 kV / 100 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 37.50, lon: -122.25 },
-        { mfg: "Niagara Power", loc: "Buffalo, NY [USA]", cap: "138 kV / 50 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 42.88, lon: -78.87 },
-        { mfg: "Northern Transformer", loc: "Vaughan, ON [CAN]", cap: "230 kV / 200 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 43.83, lon: -79.50 },
-        { mfg: "PTI Transformers", loc: "Regina, SK [CAN]", cap: "230 kV / 40 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 50.44, lon: -104.61 },
-        { mfg: "Hitachi Energy", loc: "Jefferson City, MO [USA]", cap: "161 kV / HV Sub", oem: "Global", cat: "Transformer", reg: "North America", lat: 38.57, lon: -92.17 },
-        { mfg: "Hitachi Energy", loc: "San Luis Potosí [MEX]", cap: "500 kV / 300+ MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 22.15, lon: -100.98 },
-        { mfg: "Prolec GE", loc: "Goldsboro, NC [USA]", cap: "230 kV / 112 MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 35.38, lon: -77.99 },
-        { mfg: "Prolec GE", loc: "Monterrey, NL [MEX]", cap: "500 kV / 300+ MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 25.68, lon: -100.31 },
-        { mfg: "Ayr Partner (BHEL)", loc: "Prayagraj [IN]", cap: "1200 kV / Ultra HV", oem: "International", cat: "Transformer", reg: "International", lat: 25.43, lon: 81.84 },
-        { mfg: "Ayr Partner (T&R)", loc: "Ahmedabad [IN]", cap: "765 kV / EHV Power", oem: "International", cat: "Transformer", reg: "International", lat: 23.02, lon: 72.57 },
-        { mfg: "Ayr Partner (Voltamp)", loc: "Vadodara [IN]", cap: "500 kV / 500 MVA", oem: "International", cat: "Transformer", reg: "International", lat: 22.30, lon: 73.18 },
-        { mfg: "Ayr Partner (CGL)", loc: "Mumbai [IN]", cap: "765 kV / Switchgear", oem: "International", cat: "Breaker", reg: "International", lat: 19.07, lon: 72.87 },
-        { mfg: "Zetwerk Mfg", loc: "Hosur [IN]", cap: "400 kV / 315 MVA", oem: "International", cat: "Transformer", reg: "International", lat: 12.74, lon: 77.82 },
-        { mfg: "Zetwerk Mfg", loc: "Chennai [IN]", cap: "220 kV / 100 MVA", oem: "International", cat: "Transformer", reg: "International", lat: 13.08, lon: 80.27 },
-        { mfg: "Ayr Partner (Voltamp)", loc: "Savli [IN]", cap: "220 kV / 100 MVA", oem: "International", cat: "Transformer", reg: "International", lat: 22.54, lon: 73.23 },
-        { mfg: "TBEA", loc: "Shenyang [CHN]", cap: "1200 kV / Ultra HV", oem: "International", cat: "Transformer", reg: "International", lat: 41.80, lon: 123.43 },
-        { mfg: "JSHP Transformer", loc: "Changzhou [CHN]", cap: "500 kV / 500 MVA", oem: "International", cat: "Transformer", reg: "International", lat: 31.78, lon: 119.96 },
-        { mfg: "Toshiba", loc: "Hamakita [JPN]", cap: "800 kV / GIS", oem: "Global", cat: "Breaker", reg: "International", lat: 34.71, lon: 137.73 },
-        { mfg: "Hitachi Energy", loc: "Ludvika [SWE]", cap: "1100 kV / HVDC", oem: "Global", cat: "Transformer", reg: "International", lat: 60.14, lon: 15.18 },
-        { mfg: "Siemens Energy", loc: "Nuremberg [GER]", cap: "800 kV / EHV Power", oem: "Global", cat: "Transformer", reg: "International", lat: 49.45, lon: 11.07 },
-        { mfg: "Schneider Electric", loc: "Grenoble [FRA]", cap: "145 kV / GIS", oem: "Global", cat: "Breaker", reg: "International", lat: 45.18, lon: 5.72 },
-        { mfg: "ABB", loc: "Bad Honnef [GER]", cap: "400 kV / 500 MVA", oem: "Global", cat: "Transformer", reg: "International", lat: 50.64, lon: 7.22 },
-        { mfg: "Iljin Electric", loc: "Hwaseong [KOR]", cap: "550 kV / GIS", oem: "International", cat: "Breaker", reg: "International", lat: 37.19, lon: 126.83 },
-        { mfg: "LS Electric", loc: "Cheonan [KOR]", cap: "800 kV / GIS", oem: "International", cat: "Breaker", reg: "International", lat: 36.81, lon: 127.11 },
-        { mfg: "Siemens Energy", loc: "Jinan [CHN]", cap: "500 kV / 300 MVA", oem: "Global", cat: "Transformer", reg: "International", lat: 36.65, lon: 117.00 },
-        { mfg: "Hitachi Energy", loc: "Belo Horizonte [BRA]", cap: "500 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: -19.91, lon: -43.93 },
-        { mfg: "GE Vernova", loc: "Sesto S. G. [ITA]", cap: "420 kV / GIS", oem: "Global", cat: "Breaker", reg: "International", lat: 45.53, lon: 9.22 },
-        { mfg: "Mitsubishi Electric", loc: "Ako [JPN]", cap: "500 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: 34.75, lon: 134.39 },
-        { mfg: "Siemens Energy", loc: "Weiz [AUT]", cap: "400 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: 47.21, lon: 15.62 },
-        { mfg: "Ayr Partner", loc: "Pune [IN]", cap: "220 kV / Dist.", oem: "International", cat: "Transformer", reg: "International", lat: 18.52, lon: 73.85 },
-        { mfg: "Ayr Partner", loc: "Kolkata [IN]", cap: "132 kV / Power", oem: "International", cat: "Transformer", reg: "International", lat: 22.57, lon: 88.36 },
-        { mfg: "Ayr Partner", loc: "Bangalore [IN]", cap: "400 kV / GIS", oem: "International", cat: "Breaker", reg: "International", lat: 12.97, lon: 77.59 },
-        { mfg: "Hitachi Energy", loc: "Hanoi [VNM]", cap: "220 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: 21.02, lon: 105.83 },
-        { mfg: "Siemens Energy", loc: "Bogota [COL]", cap: "220 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: 4.71, lon: -74.07 },
-        { mfg: "ABB", loc: "Cordoba [ARG]", cap: "132 kV / Power", oem: "Global", cat: "Transformer", reg: "International", lat: -31.42, lon: -64.18 },
-        { mfg: "WEG", loc: "Jaraguá [BRA]", cap: "500 kV / 500 MVA", oem: "Regional", cat: "Transformer", reg: "International", lat: -26.48, lon: -49.07 },
-        { mfg: "Delta Star", loc: "Auburn, IN [USA]", cap: "138 kV / Power", oem: "Regional", cat: "Transformer", reg: "North America", lat: 41.36, lon: -85.05 },
-        { mfg: "Virginia Transformer", loc: "Monterrey [MEX]", cap: "525 kV / 300 MVA", oem: "Regional", cat: "Transformer", reg: "North America", lat: 25.72, lon: -100.32 },
-        { mfg: "Eaton", loc: "Greenwood, SC [USA]", cap: "38 kV / Switchgear", oem: "Global", cat: "Breaker", reg: "North America", lat: 34.19, lon: -82.16 },
-        { mfg: "Eaton", loc: "Waukesha, WI [USA]", cap: "35 kV / Dist.", oem: "Global", cat: "Transformer", reg: "North America", lat: 43.01, lon: -88.23 },
-        { mfg: "Schneider Electric", loc: "Hopkinsville, KY", cap: "MV / Switchgear", oem: "Global", cat: "Breaker", reg: "North America", lat: 36.86, lon: -87.48 },
-        { mfg: "Powell Industries", loc: "Houston, TX [USA]", cap: "38 kV / Switchgear", oem: "Regional", cat: "Breaker", reg: "North America", lat: 29.76, lon: -95.36 },
-        { mfg: "Myers Power", loc: "Ontario, CA [USA]", cap: "MV / Switchgear", oem: "Regional", cat: "Breaker", reg: "North America", lat: 34.06, lon: -117.65 },
-        { mfg: "Tavrida Electric", loc: "Tallinn [EST]", cap: "38 kV / Recloser", oem: "International", cat: "Breaker", reg: "International", lat: 59.43, lon: 24.75 },
-        { mfg: "Lucy Electric", loc: "Thame [UK]", cap: "36 kV / RMU", oem: "International", cat: "Breaker", reg: "International", lat: 51.74, lon: -0.97 },
-        { mfg: "Ormazabal", loc: "Igorre [ESP]", cap: "36 kV / GIS", oem: "International", cat: "Breaker", reg: "International", lat: 43.13, lon: -2.77 },
-        { mfg: "Wilson Transformer", loc: "Wodonga [AUS]", cap: "220 kV / Power", oem: "International", cat: "Transformer", reg: "International", lat: -36.12, lon: 146.88 },
-        { mfg: "Fortune Electric", loc: "Chung-Li [TWN]", cap: "500 kV / Power", oem: "International", cat: "Transformer", reg: "International", lat: 24.96, lon: 121.22 },
-        { mfg: "Crompton Greaves", loc: "Bhopal [IN]", cap: "765 kV / EHV", oem: "International", cat: "Transformer", reg: "International", lat: 23.25, lon: 77.41 },
-        { mfg: "Ayr Service", loc: "Houston, TX [USA]", cap: "Field / Mobile", oem: "Regional", cat: "Transformer", reg: "North America", lat: 29.80, lon: -95.40 },
-        { mfg: "Prolec GE", loc: "Shreveport, LA", cap: "Network / 5 MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 32.51, lon: -93.75 },
-        { mfg: "Siemens Energy", loc: "Guanajuato [MEX]", cap: "500 kV / 300+ MVA", oem: "Global", cat: "Transformer", reg: "North America", lat: 21.01, lon: -101.25 },
-        { mfg: "Hitachi Energy", loc: "Jefferson City, MO", cap: "Dist / Padmount", oem: "Global", cat: "Transformer", reg: "North America", lat: 38.58, lon: -92.18 },
-        { mfg: "Virginia Transformer", loc: "Pocatello (Dry)", cap: "7 MVA / 35 kV", oem: "Regional", cat: "Transformer", reg: "North America", lat: 42.88, lon: -112.45 }
-    ];
+
+    // Python injects JSON array here
+    const DATA = [{"mfg": "Hyosung HICO", "loc": "Memphis, TN [USA]", "cap": "765 kV / 2250 MVA", "oem": "International", "cat": "Transformer", "reg": "North America", "lat": 35.07, "lon": -90.1}, {"mfg": "Hyundai Electric", "loc": "Montgomery, AL [USA]", "cap": "800 kV / 21k MVA-yr", "oem": "International", "cat": "Transformer", "reg": "North America", "lat": 32.26, "lon": -86.37}, {"mfg": "Hitachi Energy", "loc": "Varennes, QC [CAN]", "cap": "765 kV / EHV Power", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 45.68, "lon": -73.43}, {"mfg": "Hitachi Energy", "loc": "South Boston, VA [USA]", "cap": "765 kV / 800+ MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 36.67, "lon": -78.92}, {"mfg": "PTTI (PA Transformer)", "loc": "Canonsburg, PA [USA]", "cap": "765 kV / 750 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 40.26, "lon": -80.19}, {"mfg": "Prolec GE", "loc": "Waukesha, WI [USA]", "cap": "345 kV / 1200 MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 43.0, "lon": -88.24}, {"mfg": "Virginia Transformer", "loc": "Roanoke, VA [USA]", "cap": "525 kV / 1400 MVA-yr", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 37.27, "lon": -79.94}, {"mfg": "Virginia Transformer", "loc": "Rincon, GA [USA]", "cap": "525 kV / 500 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 32.29, "lon": -81.23}, {"mfg": "Virginia Transformer", "loc": "Pocatello, ID [USA]", "cap": "345 kV / 200 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 42.87, "lon": -112.44}, {"mfg": "Virginia Transformer", "loc": "Chihuahua [MEX]", "cap": "230 kV / 200 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 28.63, "lon": -106.06}, {"mfg": "PTI Transformers", "loc": "Winnipeg (Rockman), MB", "cap": "525 kV / 600 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 49.85, "lon": -97.14}, {"mfg": "PTI Transformers", "loc": "Winnipeg (Service), MB", "cap": "138 kV / Repair", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 49.92, "lon": -97.1}, {"mfg": "Mitsubishi (MEPPI)", "loc": "Warrendale, PA [USA]", "cap": "800 kV / GCB-GIS", "oem": "International", "cat": "Breaker", "reg": "North America", "lat": 40.67, "lon": -80.11}, {"mfg": "GE Vernova", "loc": "Charleroi, PA [USA]", "cap": "550 kV / Dead Tank", "oem": "Global", "cat": "Breaker", "reg": "North America", "lat": 40.13, "lon": -79.9}, {"mfg": "Siemens Energy", "loc": "Richland, MS [USA]", "cap": "550 kV / Blue GIS", "oem": "Global", "cat": "Breaker", "reg": "North America", "lat": 32.22, "lon": -90.17}, {"mfg": "Hitachi Energy", "loc": "Mt. Pleasant, PA [USA]", "cap": "420 kV / EconiQ DTB", "oem": "Global", "cat": "Breaker", "reg": "North America", "lat": 40.15, "lon": -79.54}, {"mfg": "Howard Industries", "loc": "Laurel, MS [USA]", "cap": "HV / 100+ MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 31.69, "lon": -89.13}, {"mfg": "WEG (Voltran)", "loc": "Huehuetoca [MEX]", "cap": "500 kV / 300+ MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 19.83, "lon": -99.2}, {"mfg": "Delta Star", "loc": "Lynchburg, VA [USA]", "cap": "230 kV / 150 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 37.41, "lon": -79.14}, {"mfg": "Delta Star", "loc": "San Carlos, CA [USA]", "cap": "230 kV / 100 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 37.5, "lon": -122.25}, {"mfg": "Niagara Power", "loc": "Buffalo, NY [USA]", "cap": "138 kV / 50 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 42.88, "lon": -78.87}, {"mfg": "Northern Transformer", "loc": "Vaughan, ON [CAN]", "cap": "230 kV / 200 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 43.83, "lon": -79.5}, {"mfg": "PTI Transformers", "loc": "Regina, SK [CAN]", "cap": "230 kV / 40 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 50.44, "lon": -104.61}, {"mfg": "Hitachi Energy", "loc": "Jefferson City, MO [USA]", "cap": "161 kV / HV Sub", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 38.57, "lon": -92.17}, {"mfg": "Hitachi Energy", "loc": "San Luis Potosí [MEX]", "cap": "500 kV / 300+ MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 22.15, "lon": -100.98}, {"mfg": "Prolec GE", "loc": "Goldsboro, NC [USA]", "cap": "230 kV / 112 MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 35.38, "lon": -77.99}, {"mfg": "Prolec GE", "loc": "Monterrey, NL [MEX]", "cap": "500 kV / 300+ MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 25.68, "lon": -100.31}, {"mfg": "Ayr Partner (BHEL)", "loc": "Prayagraj [IN]", "cap": "1200 kV / Ultra HV", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 25.43, "lon": 81.84}, {"mfg": "Ayr Partner (T&R)", "loc": "Ahmedabad [IN]", "cap": "765 kV / EHV Power", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 23.02, "lon": 72.57}, {"mfg": "Ayr Partner (Voltamp)", "loc": "Vadodara [IN]", "cap": "500 kV / 500 MVA", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 22.3, "lon": 73.18}, {"mfg": "Ayr Partner (CGL)", "loc": "Mumbai [IN]", "cap": "765 kV / Switchgear", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 19.07, "lon": 72.87}, {"mfg": "Zetwerk Mfg", "loc": "Hosur [IN]", "cap": "400 kV / 315 MVA", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 12.74, "lon": 77.82}, {"mfg": "Zetwerk Mfg", "loc": "Chennai [IN]", "cap": "220 kV / 100 MVA", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 13.08, "lon": 80.27}, {"mfg": "Ayr Partner (Voltamp)", "loc": "Savli [IN]", "cap": "220 kV / 100 MVA", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 22.54, "lon": 73.23}, {"mfg": "TBEA", "loc": "Shenyang [CHN]", "cap": "1200 kV / Ultra HV", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 41.8, "lon": 123.43}, {"mfg": "JSHP Transformer", "loc": "Changzhou [CHN]", "cap": "500 kV / 500 MVA", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 31.78, "lon": 119.96}, {"mfg": "Toshiba", "loc": "Hamakita [JPN]", "cap": "800 kV / GIS", "oem": "Global", "cat": "Breaker", "reg": "International", "lat": 34.71, "lon": 137.73}, {"mfg": "Hitachi Energy", "loc": "Ludvika [SWE]", "cap": "1100 kV / HVDC", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 60.14, "lon": 15.18}, {"mfg": "Siemens Energy", "loc": "Nuremberg [GER]", "cap": "800 kV / EHV Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 49.45, "lon": 11.07}, {"mfg": "Schneider Electric", "loc": "Grenoble [FRA]", "cap": "145 kV / GIS", "oem": "Global", "cat": "Breaker", "reg": "International", "lat": 45.18, "lon": 5.72}, {"mfg": "ABB", "loc": "Bad Honnef [GER]", "cap": "400 kV / 500 MVA", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 50.64, "lon": 7.22}, {"mfg": "Iljin Electric", "loc": "Hwaseong [KOR]", "cap": "550 kV / GIS", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 37.19, "lon": 126.83}, {"mfg": "LS Electric", "loc": "Cheonan [KOR]", "cap": "800 kV / GIS", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 36.81, "lon": 127.11}, {"mfg": "Siemens Energy", "loc": "Jinan [CHN]", "cap": "500 kV / 300 MVA", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 36.65, "lon": 117.0}, {"mfg": "Hitachi Energy", "loc": "Belo Horizonte [BRA]", "cap": "500 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": -19.91, "lon": -43.93}, {"mfg": "GE Vernova", "loc": "Sesto S. G. [ITA]", "cap": "420 kV / GIS", "oem": "Global", "cat": "Breaker", "reg": "International", "lat": 45.53, "lon": 9.22}, {"mfg": "Mitsubishi Electric", "loc": "Ako [JPN]", "cap": "500 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 34.75, "lon": 134.39}, {"mfg": "Siemens Energy", "loc": "Weiz [AUT]", "cap": "400 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 47.21, "lon": 15.62}, {"mfg": "Ayr Partner", "loc": "Pune [IN]", "cap": "220 kV / Dist.", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 18.52, "lon": 73.85}, {"mfg": "Ayr Partner", "loc": "Kolkata [IN]", "cap": "132 kV / Power", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 22.57, "lon": 88.36}, {"mfg": "Ayr Partner", "loc": "Bangalore [IN]", "cap": "400 kV / GIS", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 12.97, "lon": 77.59}, {"mfg": "Hitachi Energy", "loc": "Hanoi [VNM]", "cap": "220 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 21.02, "lon": 105.83}, {"mfg": "Siemens Energy", "loc": "Bogota [COL]", "cap": "220 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": 4.71, "lon": -74.07}, {"mfg": "ABB", "loc": "Cordoba [ARG]", "cap": "132 kV / Power", "oem": "Global", "cat": "Transformer", "reg": "International", "lat": -31.42, "lon": -64.18}, {"mfg": "WEG", "loc": "Jaraguá [BRA]", "cap": "500 kV / 500 MVA", "oem": "Regional", "cat": "Transformer", "reg": "International", "lat": -26.48, "lon": -49.07}, {"mfg": "Delta Star", "loc": "Auburn, IN [USA]", "cap": "138 kV / Power", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 41.36, "lon": -85.05}, {"mfg": "Virginia Transformer", "loc": "Monterrey [MEX]", "cap": "525 kV / 300 MVA", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 25.72, "lon": -100.32}, {"mfg": "Eaton", "loc": "Greenwood, SC [USA]", "cap": "38 kV / Switchgear", "oem": "Global", "cat": "Breaker", "reg": "North America", "lat": 34.19, "lon": -82.16}, {"mfg": "Eaton", "loc": "Waukesha, WI [USA]", "cap": "35 kV / Dist.", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 43.01, "lon": -88.23}, {"mfg": "Schneider Electric", "loc": "Hopkinsville, KY", "cap": "MV / Switchgear", "oem": "Global", "cat": "Breaker", "reg": "North America", "lat": 36.86, "lon": -87.48}, {"mfg": "Powell Industries", "loc": "Houston, TX [USA]", "cap": "38 kV / Switchgear", "oem": "Regional", "cat": "Breaker", "reg": "North America", "lat": 29.76, "lon": -95.36}, {"mfg": "Myers Power", "loc": "Ontario, CA [USA]", "cap": "MV / Switchgear", "oem": "Regional", "cat": "Breaker", "reg": "North America", "lat": 34.06, "lon": -117.65}, {"mfg": "Tavrida Electric", "loc": "Tallinn [EST]", "cap": "38 kV / Recloser", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 59.43, "lon": 24.75}, {"mfg": "Lucy Electric", "loc": "Thame [UK]", "cap": "36 kV / RMU", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 51.74, "lon": -0.97}, {"mfg": "Ormazabal", "loc": "Igorre [ESP]", "cap": "36 kV / GIS", "oem": "International", "cat": "Breaker", "reg": "International", "lat": 43.13, "lon": -2.77}, {"mfg": "Wilson Transformer", "loc": "Wodonga [AUS]", "cap": "220 kV / Power", "oem": "International", "cat": "Transformer", "reg": "International", "lat": -36.12, "lon": 146.88}, {"mfg": "Fortune Electric", "loc": "Chung-Li [TWN]", "cap": "500 kV / Power", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 24.96, "lon": 121.22}, {"mfg": "Crompton Greaves", "loc": "Bhopal [IN]", "cap": "765 kV / EHV", "oem": "International", "cat": "Transformer", "reg": "International", "lat": 23.25, "lon": 77.41}, {"mfg": "Ayr Service", "loc": "Houston, TX [USA]", "cap": "Field / Mobile", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 29.8, "lon": -95.4}, {"mfg": "Prolec GE", "loc": "Shreveport, LA", "cap": "Network / 5 MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 32.51, "lon": -93.75}, {"mfg": "Siemens Energy", "loc": "Guanajuato [MEX]", "cap": "500 kV / 300+ MVA", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 21.01, "lon": -101.25}, {"mfg": "Hitachi Energy", "loc": "Jefferson City, MO", "cap": "Dist / Padmount", "oem": "Global", "cat": "Transformer", "reg": "North America", "lat": 38.58, "lon": -92.18}, {"mfg": "Virginia Transformer", "loc": "Pocatello (Dry)", "cap": "7 MVA / 35 kV", "oem": "Regional", "cat": "Transformer", "reg": "North America", "lat": 42.88, "lon": -112.45}];
 
     const map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
     const mGroup = L.layerGroup().addTo(map);
 
     function updateSlider(val) {
-        document.getElementById('voltVal').innerText = val + " kV";
-        renderUI();
+      document.getElementById('voltVal').innerText = val + " kV";
+      renderUI();
     }
 
     function extractVoltage(str) {
-        const match = str.match(/(\d+)\s*kV/i);
-        return match ? parseInt(match[1]) : 0;
+      const match = String(str).match(/(\d+)\s*kV/i);
+      return match ? parseInt(match[1]) : 0;
     }
 
     function renderUI() {
-        const type = document.getElementById('typeFilter').value;
-        const reg = document.getElementById('regFilter').value;
-        const search = document.getElementById('searchTerm').value.toLowerCase();
-        const minVolt = parseInt(document.getElementById('voltSlider').value);
-        const labelsOn = document.getElementById('labelToggle').checked;
-        const tbody = document.getElementById('tbody');
-        tbody.innerHTML = "";
-        mGroup.clearLayers();
+      const type = document.getElementById('typeFilter').value;
+      const reg = document.getElementById('regFilter').value;
+      const search = document.getElementById('searchTerm').value.toLowerCase();
+      const minVolt = parseInt(document.getElementById('voltSlider').value);
+      const labelsOn = document.getElementById('labelToggle').checked;
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = "";
+      mGroup.clearLayers();
 
-        let count = 1;
-        DATA.forEach(s => {
-            const v = extractVoltage(s.cap);
-            const matchesSearch = s.mfg.toLowerCase().includes(search) || s.loc.toLowerCase().includes(search) || s.cap.toLowerCase().includes(search);
-            const matchesVolt = (minVolt === 0 || v >= minVolt);
+      let count = 1;
+      DATA.forEach(s => {
+        const v = extractVoltage(s.cap);
+        const matchesSearch =
+          String(s.mfg).toLowerCase().includes(search) ||
+          String(s.loc).toLowerCase().includes(search) ||
+          String(s.cap).toLowerCase().includes(search);
 
-            if (matchesSearch && matchesVolt && (type === "All" || s.cat === type) && (reg === "All" || s.reg === reg)) {
-                const row = tbody.insertRow();
-                row.innerHTML = `<td>${count}</td><td><b>${s.mfg}</b></td><td>${s.loc}</td><td>${s.cap}</td><td><span class="pill" style="background:${COLORS[s.oem]}">${s.oem}</span></td><td><span class="pill" style="background:#64748b">${s.cat}</span></td>`;
-                
-                const marker = L.circleMarker([s.lat, s.lon], { radius: 6, fillColor: COLORS[s.oem], color: "#fff", weight: 1.5, fillOpacity: 0.9 }).addTo(mGroup);
-                
-                if (labelsOn) {
-                    const labelTxt = s.cap.length > 5 ? `${s.mfg} - ${s.cap}` : s.mfg;
-                    marker.bindTooltip(labelTxt, { permanent: true, className: 'site-label', direction: 'right', offset: [8, 0] });
-                }
-                marker.bindPopup(`<strong>${s.mfg}</strong><br>${s.loc}<br>${s.cap}`);
-                count++;
-            }
-        });
+        const matchesVolt = (minVolt === 0 || v >= minVolt);
+
+        if (
+          matchesSearch && matchesVolt &&
+          (type === "All" || s.cat === type) &&
+          (reg === "All" || s.reg === reg)
+        ) {
+          const row = tbody.insertRow();
+          row.innerHTML =
+            `<td>${count}</td>
+             <td><b>${s.mfg}</b></td>
+             <td>${s.loc}</td>
+             <td>${s.cap}</td>
+             <td><span class="pill" style="background:${COLORS[s.oem] || "#64748b"}">${s.oem}</span></td>
+             <td><span class="pill" style="background:#64748b">${s.cat}</span></td>`;
+
+          const marker = L.circleMarker([s.lat, s.lon], {
+            radius: 6,
+            fillColor: COLORS[s.oem] || "#64748b",
+            color: "#fff",
+            weight: 1.5,
+            fillOpacity: 0.92
+          }).addTo(mGroup);
+
+          if (labelsOn) {
+            const labelTxt = s.cap && s.cap.length > 5 ? `${s.mfg} - ${s.cap}` : s.mfg;
+            marker.bindTooltip(labelTxt, {
+              permanent: true,
+              className: 'site-label',
+              direction: 'right',
+              offset: [8, 0]
+            });
+          }
+
+          marker.bindPopup(`<strong>${s.mfg}</strong><br>${s.loc}<br>${s.cap}`);
+          count++;
+        }
+      });
     }
 
     const legend = L.control({position: 'bottomright'});
     legend.onAdd = function () {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML += '<b>OEM Class</b><br>';
-        for (let label in COLORS) { div.innerHTML += `<i style="background:${COLORS[label]}"></i> ${label}<br>`; }
-        return div;
+      const div = L.DomUtil.create('div', 'legend');
+      div.innerHTML += '<b>OEM Class</b><br>';
+      for (let label in COLORS) {
+        div.innerHTML += `<i style="background:${COLORS[label]}"></i> ${label}<br>`;
+      }
+      return div;
     };
     legend.addTo(map);
 
@@ -234,17 +502,17 @@
     let isResizing = false;
     resizer.addEventListener('mousedown', () => isResizing = true);
     document.addEventListener('mousemove', (e) => {
-        if (!isResizing) return;
-        let offset = e.clientY - 90;
-        let percentage = (offset / (window.innerHeight - 90)) * 100;
-        if (percentage > 20 && percentage < 80) {
-            area.style.height = percentage + "%";
-            map.invalidateSize();
-        }
+      if (!isResizing) return;
+      let offset = e.clientY - 96;
+      let percentage = (offset / (window.innerHeight - 96)) * 100;
+      if (percentage > 20 && percentage < 80) {
+        area.style.height = percentage + "%";
+        map.invalidateSize();
+      }
     });
     document.addEventListener('mouseup', () => isResizing = false);
 
     renderUI();
-</script>
+  </script>
 </body>
 </html>
