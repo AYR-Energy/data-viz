@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 CSV_PATH = "data.csv"
-TEMPLATE_PATH = "template5.html"
+TEMPLATE_PATH = "template.html"
 OUT_DIR = "docs"
 OUT_HTML = os.path.join(OUT_DIR, "index.html")
 
