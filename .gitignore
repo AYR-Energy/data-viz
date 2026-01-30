@@ -1,0 +1,6 @@
+.DS_Store
+*.html
+*.ipynb
+*.lock
+.venv
+.python-version
