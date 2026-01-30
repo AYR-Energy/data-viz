@@ -422,6 +422,31 @@
     .leaflet-container a.leaflet-popup-close-button{
       color: rgba(255,255,255,0.78);
     }
+    /* Leaflet reset view control */
+    .leaflet-control-reset{
+      background: #ffffff;
+      border: 1px solid #dbe4f0;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      color: #64748b;          /* grey icon */
+      font-size: 18px;
+      font-weight: 800;
+
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    .leaflet-control-reset:hover{
+      background: #f8fafc;
+      color: #2000D3;          /* AYR blue on hover */
+    }
+
+
 
     @media (max-width: 980px){
       .topbar{ height: auto; padding: 14px 16px; align-items:flex-start; }
@@ -537,6 +562,44 @@
     const map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
     const mGroup = L.layerGroup().addTo(map);
+
+    const ResetControl = L.Control.extend({
+    options: { position: 'topleft' },
+
+    onAdd: function () {
+      const div = L.DomUtil.create('div', 'leaflet-control-reset');
+      div.innerHTML = '⌂';
+      div.title = 'Reset view';
+
+
+      L.DomEvent.disableClickPropagation(div);
+
+      div.addEventListener('click', () => {
+        // Reset map view
+        map.setView([20, 0], 2, { animate: true });
+
+        // Clear selected marker highlight
+        if (selectedMarker) {
+          setMarkerHighlight(selectedMarker, false);
+          selectedMarker = null;
+        }
+
+        // Clear hovered marker
+      if (hoveredMarker) {
+        setMarkerHighlight(hoveredMarker, false);
+        hoveredMarker = null;
+      }
+
+      // Clear selected table row
+      clearSelectedRow();
+    });
+
+    return div;
+  }
+});
+
+map.addControl(new ResetControl());
+
 
     function updateSlider(val) {
       document.getElementById('voltVal').innerText = val + " kV";
